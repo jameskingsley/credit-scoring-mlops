@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Data folders
+data/raw/
+data/processed/
+
+# Model artifacts
+*.pkl
+*.joblib
+
+# ClearML
+.clearml/

@@ -1,23 +1,33 @@
-# Python cache
+# Python
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.env.*
+
+# Virtual environments
+venv/
+env/
+.venv/
 
 # Jupyter
 .ipynb_checkpoints/
 
-# Virtual environments
-.venv/
-venv/
-
-# Environment variables
-.env
-
-# Data folders
-data/raw/
-data/processed/
+# ML / experiments
+mlruns/
+clearml/
+logs/
+*.log
 
 # Model artifacts
+models/
 *.pkl
 *.joblib
 
-# ClearML
-.clearml/
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml

@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
 
-API_URL = "https://your-render-url.onrender.com/predict"
+API_URL = "https://credit-scoring-mlops-933z.onrender.com/predict"
 
 st.set_page_config(page_title="Credit Scoring System", layout="centered")
 
-st.title("🏦 Credit Default Risk Scoring")
+st.title("Credit Default Risk Scoring")
 
 with st.form("credit_form"):
     age = st.number_input("Age", 18, 100)

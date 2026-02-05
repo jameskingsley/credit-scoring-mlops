@@ -1,31 +1,40 @@
 from fastapi import FastAPI
 import pandas as pd
 import joblib
+import os
+
 from catboost import CatBoostRegressor
 from clearml import Task
 from api.schema import CreditInput
 
+# FastAPI app
 app = FastAPI(title="Credit Scoring API")
 
-# -------------------------------
-# Load artifacts from training task
-# -------------------------------
-TRAINING_TASK_ID = "dd91465cfbeb426c925678ebccd9676d"
+# Global objects (loaded once)
+model = None
+preprocessor = None
 
-task = Task.get_task(task_id=TRAINING_TASK_ID)
+# Startup: load model from ClearML
+@app.on_event("startup")
+def startup_event():
+    global model, preprocessor
 
-# Preprocessor (artifact)
-preprocessor_path = task.artifacts["preprocessor"].get_local_copy()
-preprocessor = joblib.load(preprocessor_path)
+    TRAINING_TASK_ID = os.getenv("TRAINING_TASK_ID")
+    if not TRAINING_TASK_ID:
+        raise RuntimeError("TRAINING_TASK_ID environment variable is not set")
 
-# CatBoost model (artifact)
-model_path = task.artifacts["catboost_model"].get_local_copy()
-model = CatBoostRegressor()
-model.load_model(model_path)
+    task = Task.get_task(task_id=TRAINING_TASK_ID)
 
-# -------------------------------
+    # Load preprocessor
+    preprocessor_path = task.artifacts["preprocessor"].get_local_copy()
+    preprocessor = joblib.load(preprocessor_path)
+
+    # Load CatBoost model
+    model_path = task.artifacts["catboost_model"].get_local_copy()
+    model = CatBoostRegressor()
+    model.load_model(model_path)
+
 # Risk banding
-# -------------------------------
 def risk_band(pd_score: float) -> str:
     if pd_score < 0.02:
         return "Very Low"
@@ -38,12 +47,15 @@ def risk_band(pd_score: float) -> str:
     else:
         return "Very High"
 
-# -------------------------------
+
 # API Endpoints
-# -------------------------------
 @app.get("/")
 def home():
     return {"message": "Credit Scoring API is running"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 @app.post("/predict")
 def predict(data: CreditInput):
